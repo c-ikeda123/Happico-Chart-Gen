@@ -312,23 +312,47 @@ document.addEventListener('DOMContentLoaded', () => {
         return outLines.join("\n");
     }
 
-    generateBtn.addEventListener('click', () => {
+    generateBtn.addEventListener('click', async () => {
         const bpm = parseInt(bpmInput.value) || 175;
         const difficulty = parseInt(difficultySlider.value) || 5;
         const jackFreq = parseInt(jackFreqSlider.value) || 0; // Default to 0
+        
+        // Disable button while generating
+        generateBtn.disabled = true;
+        generateBtn.textContent = '生成中...';
 
-        let chartId = parseInt(localStorage.getItem('happico_chart_id')) || 1;
+        let chartId = 1;
+        if (isFirebaseReady) {
+            try {
+                const counterRef = db.ref('globalCounter');
+                const result = await counterRef.transaction((currentValue) => {
+                    return (currentValue || 0) + 1;
+                });
+                if (result.committed) {
+                    chartId = result.snapshot.val();
+                }
+            } catch (err) {
+                console.error("ID取得エラー", err);
+                chartId = parseInt(localStorage.getItem('happico_chart_id')) || 1;
+                localStorage.setItem('happico_chart_id', chartId + 1);
+            }
+        } else {
+            chartId = parseInt(localStorage.getItem('happico_chart_id')) || 1;
+            localStorage.setItem('happico_chart_id', chartId + 1);
+        }
+        
         const idStr = String(chartId).padStart(4, '0');
-
+        
         // Generate a random seed
         const seed = Date.now().toString(36) + Math.random().toString(36).substr(2);
 
         const bmsContent = generateBMS(bpm, difficulty, jackFreq, idStr, seed);
 
-        if (!bmsContent) return;
-
-        // Increment ID after successful generation
-        localStorage.setItem('happico_chart_id', chartId + 1);
+        if (!bmsContent) {
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'BMS譜面を生成して共有';
+            return;
+        }
         
         // Calculate MD5 of the Shift-JIS file content for the difficulty table
         const unicodeArray = Encoding.stringToCode(bmsContent);
@@ -366,6 +390,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert('Firebaseが設定されていないため、タイムラインに共有されませんでした。');
         }
+        
+        // Re-enable button
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'BMS譜面を生成して共有';
     });
 
     // --- ZIP Download Logic ---
