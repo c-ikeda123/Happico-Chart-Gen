@@ -322,7 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
         generateBtn.textContent = '生成中...';
 
         let chartId = 1;
-        if (isFirebaseReady) {
+        if (!isFirebaseReady) {
+            alert('Firebaseが設定されていません。ローカルテスト用IDで生成します。');
+            chartId = Math.floor(Math.random() * 10000);
+        } else {
             try {
                 const counterRef = db.ref('globalCounter');
                 const result = await counterRef.transaction((currentValue) => {
@@ -330,15 +333,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 if (result.committed) {
                     chartId = result.snapshot.val();
+                } else {
+                    throw new Error("Transaction aborted");
                 }
             } catch (err) {
                 console.error("ID取得エラー", err);
-                chartId = parseInt(localStorage.getItem('happico_chart_id')) || 1;
-                localStorage.setItem('happico_chart_id', chartId + 1);
+                alert("データベースからのID取得に失敗しました。Firebaseのルール設定（Rules）が読み書き許可になっているか確認してください。\n\n詳細: " + err.message);
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'BMS譜面を生成して共有';
+                return;
             }
-        } else {
-            chartId = parseInt(localStorage.getItem('happico_chart_id')) || 1;
-            localStorage.setItem('happico_chart_id', chartId + 1);
         }
         
         const idStr = String(chartId).padStart(4, '0');
