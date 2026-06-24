@@ -1,0 +1,5 @@
+{
+  "name": "Happico Happico 差分難易度表",
+  "symbol": "Hp",
+  "data_url": "https://happico-charts-default-rtdb.firebaseio.com/tableData.json"
+}

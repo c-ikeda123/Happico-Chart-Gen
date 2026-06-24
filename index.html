@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happico Happico Chart Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+    <body class="dark-mode">
+    <div class="layout-wrapper">
+        <div class="container">
+        <header>
+            <h1>Happico Happico Chart Generator</h1>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" checked />
+                    <div class="slider round"></div>
+                </label>
+                <span id="theme-label">Dark Mode</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="control-group">
+                <label for="bpm">BPM</label>
+                <input type="number" id="bpm" value="175" min="1" max="999">
+                <p class="description">楽曲のテンポを設定します。</p>
+            </div>
+
+            <div class="control-group">
+                    <label for="difficulty">難易度 (密度): <span id="difficulty-val">10</span></label>
+                    <input type="range" id="difficulty" min="1" max="20" value="10">
+                    <p class="description">1で低密度（03_happico_Aと同等）、20で超高密度になります。</p>
+            </div>
+
+            <div class="control-group">
+                <label for="jackFreq">縦連頻度 <span id="jackFreq-val">3</span></label>
+                <input type="range" id="jackFreq" min="0" max="10" value="3">
+                <p class="description">同じ鍵盤に連続してノーツが降ってくる頻度を設定します。</p>
+            </div>
+
+                <button id="generate-btn">BMS譜面を生成して共有</button>
+        </main>
+
+        <footer>
+            <p>Generated BMS is designed to be played with "[しらいし] Happico Happico".</p>
+        </footer>
+        </div>
+        
+        <div class="timeline-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0; border: none; padding: 0;">🌍 みんなが生成した譜面</h2>
+                <button id="download-all-btn" class="dl-btn" style="background-color: #007bff; color: white; border-color: #0056b3;">全譜面を一括DL (ZIP)</button>
+            </div>
+            <div id="timeline-list" class="timeline-list">
+                <!-- Timeline items will be injected here -->
+                <p class="description" style="text-align: center; margin-top: 2rem;">Firebaseの設定が完了するとここに譜面が表示されます。</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
+    <script src="baseChart.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happico Happico 差分難易度表</title>
+    <!-- LR2/beatoraja がテーブルとして認識するためのメタタグ -->
+    <meta name="bmstable" content="./header.json">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #bb86fc; border-bottom: 2px solid #333; padding-bottom: 0.5rem; }
+        .instructions { background: #1e1e1e; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #03dac6; }
+        .level-group { margin-bottom: 2rem; }
+        .level-header { background: #333; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; font-size: 1.2rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #444; padding: 0.8rem; text-align: left; }
+        th { background: #222; }
+        a { color: #bb86fc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Happico Happico 差分難易度表</h1>
+    
+    <div class="instructions">
+        <h3>beatoraja / LR2 への導入方法</h3>
+        <p>1. ジェネレーター画面から <strong>「全譜面を一括DL (ZIP)」</strong> ボタンを押してZIPをダウンロードし、お使いのBMSフォルダに解凍してください。</p>
+        <p>2. プレイヤーの設定画面から、以下の「難易度表URL」を登録してください。</p>
+        <p><strong>難易度表URL:</strong> <input type="text" value="" id="table-url" readonly style="width: 100%; padding: 0.5rem; background: #000; color: #fff; border: 1px solid #555; margin-top: 0.5rem; box-sizing: border-box;"></p>
+        <p style="font-size: 0.9rem; color: #aaa;">※ このURLをプレイヤーに登録すると、自動でレベル別にフォルダ分けされます。</p>
+        <p style="margin-top: 1rem;"><a href="index.html">← ジェネレーターに戻る</a></p>
+    </div>
+
+    <div id="table-container">読み込み中...</div>
+
+    <script>
+        // 現在のURLをインプットにセットする（ファイルパスでもOK）
+        document.getElementById('table-url').value = window.location.href;
+
+        // Firebaseから難易度表のデータ配列を直接取得
+        fetch('https://happico-charts-default-rtdb.firebaseio.com/tableData.json')
+            .then(res => res.json())
+            .then(data => {
+                if (!data) {
+                    document.getElementById('table-container').innerHTML = '<p>まだ譜面がありません。ジェネレーターから共有を作成してください！</p>';
+                    return;
+                }
+                
+                // レベル（密度）ごとにグループ化
+                const levels = {};
+                data.forEach(chart => {
+                    if (!chart) return; // 削除等でnullになっている配列要素をスキップ
+                    if (!levels[chart.level]) levels[chart.level] = [];
+                    levels[chart.level].push(chart);
+                });
+
+                const container = document.getElementById('table-container');
+                container.innerHTML = '';
+
+                // レベル順にソートして表示
+                Object.keys(levels).sort((a, b) => parseInt(a) - parseInt(b)).forEach(level => {
+                    const group = document.createElement('div');
+                    group.className = 'level-group';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'level-header';
+                    header.textContent = `Level ${level} (密度: ${level})`;
+                    group.appendChild(header);
+
+                    const table = document.createElement('table');
+                    table.innerHTML = `
+                        <tr>
+                            <th>タイトル</th>
+                            <th>アーティスト</th>
+                            <th>MD5</th>
+                        </tr>
+                    `;
+                    
+                    levels[level].forEach(chart => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${chart.title}</td>
+                            <td>${chart.artist}</td>
+                            <td style="font-family: monospace; font-size: 0.85rem;">${chart.md5}</td>
+                        `;
+                        table.appendChild(tr);
+                    });
+                    
+                    group.appendChild(table);
+                    container.appendChild(group);
+                });
+            })
+            .catch(err => {
+                document.getElementById('table-container').innerHTML = '<p>データの読み込みに失敗しました。</p>';
+                console.error(err);
+            });
+    </script>
+</body>
+</html>
