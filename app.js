@@ -477,17 +477,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (searchBtn && resetSearchBtn && searchInput) {
         searchBtn.addEventListener('click', () => {
-            const query = searchInput.value.trim();
+            let query = searchInput.value.trim();
             if (!query) return;
+            
+            // 数字のみの場合は0埋めした文字列も検索対象にする
+            let queryPadded = query;
+            if (/^\d+$/.test(query)) {
+                queryPadded = String(parseInt(query, 10)).padStart(4, '0');
+            }
+
             const items = document.querySelectorAll('.timeline-item');
             items.forEach(item => {
                 const titleText = item.querySelector('.timeline-header span').textContent;
-                if (titleText.includes(`[${query}]`)) {
+                if (titleText.includes(query) || titleText.includes(queryPadded)) {
                     item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
                 }
             });
+        });
+
+        // Enterキーで検索できるようにする
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
         });
 
         resetSearchBtn.addEventListener('click', () => {
