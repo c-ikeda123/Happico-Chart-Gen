@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.id = `chart-${key}`;
 
         const date = new Date(data.timestamp);
-        const timeStr = isNaN(date) ? 'Just now' : date.toLocaleTimeString();
+        const timeStr = isNaN(date) ? 'Just now' : date.toLocaleString('ja-JP');
 
         item.innerHTML = `
             <div class="timeline-header">
