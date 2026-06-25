@@ -453,22 +453,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Timeline / Feed Logic ---
     const timelineList = document.getElementById('timeline-list');
-
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const resetSearchBtn = document.getElementById('reset-search-btn');
+    
     // Listen for new charts
     if (isFirebaseReady) {
         timelineList.innerHTML = ''; // clear default message
-
-        // Order by timestamp, limit to last 50
-        chartsRef.orderByChild('timestamp').limitToLast(50).on('child_added', (snapshot) => {
+        
+        // Order by timestamp, fetch ALL charts
+        chartsRef.orderByChild('timestamp').on('child_added', (snapshot) => {
             const data = snapshot.val();
             const key = snapshot.key;
             renderTimelineItem(key, data, true);
         });
-
+        
         chartsRef.on('child_changed', (snapshot) => {
             const data = snapshot.val();
             const key = snapshot.key;
             updateVotes(key, data);
+        });
+    }
+    
+    if (searchBtn && resetSearchBtn && searchInput) {
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            const items = document.querySelectorAll('.timeline-item');
+            items.forEach(item => {
+                const titleText = item.querySelector('.timeline-header span').textContent;
+                if (titleText.includes(`[${query}]`)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        resetSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            const items = document.querySelectorAll('.timeline-item');
+            items.forEach(item => {
+                item.style.display = 'flex';
+            });
         });
     }
 

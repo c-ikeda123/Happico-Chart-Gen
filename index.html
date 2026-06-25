@@ -57,6 +57,13 @@
                     <button id="download-all-btn" class="dl-btn" style="background-color: #007bff; color: white; border-color: #0056b3;">全譜面を一括DL (ZIP)</button>
                 </div>
             </div>
+            
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <input type="text" id="search-input" placeholder="ID番号で検索 (例: 0001)" style="flex-grow: 1; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
+                <button id="search-btn" class="dl-btn" style="background-color: var(--container-bg); border: 1px solid var(--border-color); color: var(--text-color);">検索</button>
+                <button id="reset-search-btn" class="dl-btn" style="background-color: var(--container-bg); border: 1px solid var(--border-color); color: var(--text-color);">全件表示</button>
+            </div>
+            
             <div id="timeline-list" class="timeline-list">
                 <!-- Timeline items will be injected here -->
                 <p class="description" style="text-align: center; margin-top: 2rem;">Firebaseの設定が完了するとここに譜面が表示されます。</p>
